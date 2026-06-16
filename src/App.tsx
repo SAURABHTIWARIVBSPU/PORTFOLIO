@@ -487,12 +487,12 @@ function App() {
             </form>
           </motion.div>
         </section>
-      </main>
 
-      <footer className="site-footer">
-        <span>{profile.name}</span>
-        <span>Frontend Developer - React.js - MERN Stack</span>
-      </footer>
+        <footer className="site-footer">
+          <span>{profile.name}</span>
+          <span>Frontend Developer - React.js - MERN Stack</span>
+        </footer>
+      </main>
     </div>
   );
 }
