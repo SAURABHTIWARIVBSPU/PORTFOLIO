@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, MouseEvent } from "react";
 import {
   ArrowUpRight,
   Code2,
@@ -49,6 +49,39 @@ const fadeUp: MotionProps = {
 function App() {
   const [whatsAppStatus, setWhatsAppStatus] = useState("");
 
+  const handleSectionScroll = (
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (!href.startsWith("#")) return;
+
+    event.preventDefault();
+
+    const target =
+      href === "#top"
+        ? document.getElementById("top")
+        : document.querySelector<HTMLElement>(href);
+
+    if (!target) return;
+
+    const header = document.querySelector<HTMLElement>(".site-header");
+    const hasTopHeader = window.matchMedia("(max-width: 1100px)").matches;
+    const offset = hasTopHeader ? (header?.offsetHeight ?? 0) + 18 : 24;
+    const top =
+      href === "#top"
+        ? 0
+        : Math.max(0, target.getBoundingClientRect().top + window.scrollY - offset);
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    window.history.pushState(null, "", href);
+    window.scrollTo({
+      top,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
+  };
+
   const handleWhatsAppSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -82,7 +115,12 @@ function App() {
   return (
     <div className="min-h-screen text-slate-950">
       <header className="site-header">
-        <a className="brand-mark" href="#top" aria-label="Saurabh Tiwari home">
+        <a
+          className="brand-mark"
+          href="#top"
+          aria-label="Saurabh Tiwari home"
+          onClick={(event) => handleSectionScroll(event, "#top")}
+        >
           <span>ST</span>
         </a>
         <div className="brand-copy" aria-hidden="true">
@@ -91,7 +129,12 @@ function App() {
         </div>
         <nav className="hidden items-center gap-2 md:flex" aria-label="Primary">
           {navItems.map((item) => (
-            <a key={item.href} className="nav-link" href={item.href}>
+            <a
+              key={item.href}
+              className="nav-link"
+              href={item.href}
+              onClick={(event) => handleSectionScroll(event, item.href)}
+            >
               {item.label}
             </a>
           ))}
@@ -143,7 +186,11 @@ function App() {
               <p className="hero-role">{profile.headline}</p>
               <p className="hero-summary">{profile.summary}</p>
               <div className="hero-actions">
-                <a className="primary-action" href="#projects">
+                <a
+                  className="primary-action"
+                  href="#projects"
+                  onClick={(event) => handleSectionScroll(event, "#projects")}
+                >
                   <ArrowUpRight size={18} />
                   <span>View Projects</span>
                 </a>

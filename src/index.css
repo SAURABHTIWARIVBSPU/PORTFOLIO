@@ -35,19 +35,32 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior: none;
+  scroll-behavior: auto;
   scroll-padding-top: 0;
+  scrollbar-gutter: stable;
 }
 
 body {
+  min-height: 100%;
   min-width: 320px;
   margin: 0;
   overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior: none;
   background:
     radial-gradient(var(--ink) 1.2px, transparent 1.2px) 0 0 / 28px 28px,
     linear-gradient(180deg, var(--paper) 0%, #f8f3ec 52%, #fffaf4 100%);
   color: var(--ink);
   letter-spacing: 0;
+}
+
+#root {
+  min-height: 100%;
+  isolation: isolate;
 }
 
 body::before {

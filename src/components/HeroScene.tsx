@@ -17,7 +17,7 @@ export function HeroScene() {
       antialias: true,
       powerPreference: "high-performance",
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setClearColor(0xffffff, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     mount.appendChild(renderer.domElement);
@@ -161,8 +161,13 @@ export function HeroScene() {
     window.addEventListener("resize", resize);
 
     let raf = 0;
+    let sceneVisible = true;
+    let pageVisible = document.visibilityState === "visible";
     const clock = new THREE.Clock();
     const animate = () => {
+      raf = 0;
+      if (!sceneVisible || !pageVisible) return;
+
       const elapsed = clock.getElapsedTime();
       group.rotation.y = elapsed * 0.09 + pointer.x * 0.16;
       group.rotation.x = Math.sin(elapsed * 0.38) * 0.05 + pointer.y * 0.08;
@@ -176,10 +181,50 @@ export function HeroScene() {
       renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);
     };
-    animate();
+
+    const startAnimation = () => {
+      if (!raf && sceneVisible && pageVisible) {
+        raf = requestAnimationFrame(animate);
+      }
+    };
+
+    const stopAnimation = () => {
+      if (raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        sceneVisible = entry.isIntersecting;
+        if (sceneVisible && pageVisible) {
+          startAnimation();
+        } else {
+          stopAnimation();
+        }
+      },
+      { rootMargin: "160px 0px", threshold: 0 },
+    );
+    observer.observe(mount);
+
+    const onVisibilityChange = () => {
+      pageVisible = document.visibilityState === "visible";
+      if (pageVisible && sceneVisible) {
+        startAnimation();
+      } else {
+        stopAnimation();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    renderer.render(scene, camera);
+    startAnimation();
 
     return () => {
-      cancelAnimationFrame(raf);
+      stopAnimation();
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("resize", resize);
       mount.removeChild(renderer.domElement);
