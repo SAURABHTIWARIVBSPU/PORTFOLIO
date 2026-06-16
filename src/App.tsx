@@ -80,7 +80,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden text-slate-950">
+    <div className="min-h-screen text-slate-950">
       <header className="site-header">
         <a className="brand-mark" href="#top" aria-label="Saurabh Tiwari home">
           <span>ST</span>
